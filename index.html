@@ -4,11 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Title</title>
+    <title>РИСК</title>
 
     <link rel="icon" href="favicon.png" type="image/png" />
     <link rel="stylesheet" href="./node_modules/bulma/css/bulma.css">
     <link rel="stylesheet" href="./style.css">
+
+    <script src="./node_modules/vanilla-picker/dist/vanilla-picker.js"></script>
   </head>
 
   <body>
@@ -18,23 +20,26 @@
       <div class="modal-card">
       
         <header class="modal-card-head">
-          <p class="modal-card-title">РИСК</p>
+          <p class="modal-card-title has-text-centered">РИСК</p>
         </header>
         
         <section class="modal-card-body">
           <h1 class="title">Новый игрок</h1>
           <div>
-            <div class="field">
-              <label class="label">Имя</label>
-              <div class="control">
-                <input class="input" id="novyjIgrokImia" type="text" placeholder="Имя">
-              </div>
-            </div>            
-            <div class="field">
-              <label class="label">Цвет</label>
-              <div class="control">
-                <input class="input" id="novyjIgrokCvet" type="text" placeholder="RRGGBB">
-              </div>
+            <div class="columns">
+              <div class="column field">
+                <label class="label">Имя</label>
+                <div class="control">
+                  <input class="input" id="novyjIgrokImia" type="text" placeholder="Имя" autofocus>
+                </div>
+              </div>            
+              <div class="column field">
+                <label class="label">Цвет</label>
+                <div class="control is-flex">
+                    <a class="button" id="novyjIgrokCvetKnopka">...</a>
+                    <input class="input" id="novyjIgrokCvet" type="text" placeholder="RRGGBB" readonly>
+                </div>
+              </div>            
             </div>            
             <div class="field">
               <label class="label">Народ</label>
@@ -50,7 +55,7 @@
         
         <section class="modal-card-body">
           <h1 class="title">Игроки</h1>
-          <div id="igroki">
+          <div class="is-flex" id="igroki">
           </div>
         </section>
         

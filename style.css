@@ -1,8 +1,20 @@
+.modal-card {
+    width: 660px;
+}
+
 .modal-card-body {
-    width: 800px;
+    overflow: hidden;
+}
+
+.card-content {
+    padding: 0.5em;
 }
 
 .narod {
+    cursor: pointer;
+}
+
+.narod-kartinka {
     width: 76px;
     height: 140px;
     background-size: contain;
@@ -10,6 +22,24 @@
 
 .narod-vybran {
     background-color: #C0DFFF;
+}
+
+.avatar-igroka {
+    background-position-y: 0;
+    background-size: 70px;
+    overflow: hidden;
+}
+
+.imia-igroka {
+    line-height: 1.5em;
+    padding: 0.25em 0.25em 0;
+    margin: 0 !important;
+}
+
+.cvet-igroka {
+    height: 0.5em;
+    width: 100%;
+    border: 1px solid #ccc;
 }
 
 .kletka {
