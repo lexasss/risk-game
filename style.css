@@ -1,0 +1,16 @@
+.modal-card-body {
+    width: 800px;
+}
+
+.narod {
+    width: 76px;
+    height: 140px;
+    background-size: contain;
+}
+
+.narod-vybran {
+    background-color: #C0DFFF;
+}
+
+.kletka {
+}

@@ -8,12 +8,64 @@
 
     <link rel="icon" href="favicon.png" type="image/png" />
     <link rel="stylesheet" href="./node_modules/bulma/css/bulma.css">
+    <link rel="stylesheet" href="./style.css">
   </head>
 
   <body>
+    <div class="modal is-active">
+      <div class="modal-background"></div>
+      
+      <div class="modal-card">
+      
+        <header class="modal-card-head">
+          <p class="modal-card-title">РИСК</p>
+        </header>
+        
+        <section class="modal-card-body">
+          <h1 class="title">Новый игрок</h1>
+          <div>
+            <div class="field">
+              <label class="label">Имя</label>
+              <div class="control">
+                <input class="input" id="novyjIgrokImia" type="text" placeholder="Имя">
+              </div>
+            </div>            
+            <div class="field">
+              <label class="label">Цвет</label>
+              <div class="control">
+                <input class="input" id="novyjIgrokCvet" type="text" placeholder="RRGGBB">
+              </div>
+            </div>            
+            <div class="field">
+              <label class="label">Народ</label>
+              <div class="control is-flex" id="novyjIgrokNarod">
+              </div>
+            </div>            
+          </div>
+        </section>
+        
+        <footer class="modal-card-foot">
+          <button class="button is-success" id="novyjIgrokSozdat" disabled>Создать</button>
+        </footer>
+        
+        <section class="modal-card-body">
+          <h1 class="title">Игроки</h1>
+          <div id="igroki">
+          </div>
+        </section>
+        
+        <footer class="modal-card-foot">
+          <button class="button is-success" id="igrat" disabled>Играть</button>
+        </footer>
+        
+      </div>
+      
+    </div>
+    
     <section class="section">
     </section>
 
+    <script src="ui.js"></script>
     <script src="index.js"></script>
   </body>
 </html>
