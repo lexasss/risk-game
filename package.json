@@ -1,0 +1,19 @@
+{
+  "name": "risk-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lexasss/risk-game.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lexasss/risk-game/issues"
+  },
+  "homepage": "https://github.com/lexasss/risk-game#readme"
+}
