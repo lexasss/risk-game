@@ -8,13 +8,21 @@
 
     <link rel="icon" href="favicon.png" type="image/png" />
     <link rel="stylesheet" href="./node_modules/bulma/css/bulma.css">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./setup.css">
+    <link rel="stylesheet" href="./game.css">
 
     <script src="./node_modules/vanilla-picker/dist/vanilla-picker.js"></script>
-    <script src="./common.js"></script>
+    <script src="./game.js"></script>
   </head>
 
   <body>
+    <div class="igra">
+      <div class="spisok-igrokov">
+      </div>
+      <div class="karta">
+      </div>
+    </div>
+
     <div class="modal is-active" id="setup">
       <div class="modal-background"></div>
       
@@ -71,7 +79,7 @@
     <section class="section">
     </section>
 
-    <script src="ui.js"></script>
-    <script src="index.js"></script>
+    <script src="game-ui.js"></script>
+    <script src="setup-ui.js"></script>
   </body>
 </html>

@@ -1,0 +1,55 @@
+:root {
+  --razmer-karty-kletok-goriz: 15;
+  --razmer-karty-kletok-vert: 10;
+}
+
+.igra {
+  position: absolute;
+  width: 100vw;
+  display: flex;
+}
+
+.karta {
+  position: relative;
+  width: calc(100vh * 1.5);
+  height: 100vh;
+  margin: 0 auto;
+  background-image: url(./img/map.jpg);
+  background-size: 100% 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.kletka {
+  box-sizing: border-box;
+  width: calc( 100% / var(--razmer-karty-kletok-goriz));
+  height: calc( 100% / var(--razmer-karty-kletok-vert));
+
+  border: 1px solid #888;
+
+  font: bold 24px Arial;
+  color: black;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.kletka-otkuda {
+  outline: 10px solid yellow;
+}
+
+.kletka-kuda {
+  outline: 10px solid #80A0ff;
+}
+
+.spisok-igrokov {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.aktivnyj-igrok-v-spiske {
+  background-color: #ccc;
+}

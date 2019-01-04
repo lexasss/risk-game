@@ -70,19 +70,18 @@ function sozdatIgroka( e ) {
 
     igroki.push( igrok );
 
-    dobavitIgrokaVSpisok( igrok );
+    dobavitIgrokaVSpisokSozdanyh( igrok );
 
     ochistitPolia( igrok.narod );
 
-    igrok.narod.el.classList.add( 'narod-ispolzovan' );
-    igrok.narod.el.removeEventListener( 'click', callbackCollection.get( igrok.narod ) );
+    pometitNarodKakIspolzovanyj( igrok.narod );
 
     proveritKnopku_SozdatIgroka();
 
     proveritKolichestvoIgrokov();
 }
 
-function dobavitIgrokaVSpisok( igrok ) {
+function dobavitIgrokaVSpisokSozdanyh( igrok ) {
     const card = document.createElement( 'div' );
     card.classList.add('card');
     card.classList.add('igrok');
@@ -143,8 +142,7 @@ function udalitIgroka( card, igrok ) {
 
         igrokiEl.removeChild( card );
 
-        igrok.narod.el.classList.remove( 'narod-ispolzovan' );
-        igrok.narod.el.addEventListener( 'click', vybratNarod( igrok.narod ) );
+        sniatPometkuChtoNarodIspolzovan( igrok.narod );
 
         proveritKolichestvoIgrokov();
     };
@@ -155,6 +153,16 @@ function ochistitPolia( narod ) {
     novyjIgrokCvetEl.value = '';
     novyjIgrokCvetEl.style.backgroundColor = '';
     narod.el.classList.remove( 'narod-vybran' );
+}
+
+function pometitNarodKakIspolzovanyj( narod ) {
+    narod.el.classList.add( 'narod-ispolzovan' );
+    narod.el.removeEventListener( 'click', callbackCollection.get( narod ) );
+}
+
+function sniatPometkuChtoNarodIspolzovan( narod ) {
+    narod.el.classList.remove( 'narod-ispolzovan' );
+    narod.el.addEventListener( 'click', vybratNarod( narod ) );
 }
 
 function proveritKolichestvoIgrokov() {
@@ -174,3 +182,11 @@ function igrat( e ) {
 
 proveritKnopku_SozdatIgroka();
 proveritKolichestvoIgrokov();
+
+
+
+// Делаем игроков автоматически
+// igroki.push( new Igrok( 'Олег', '#ff0000ff', NARODY[0] ) );
+// igroki.push( new Igrok( 'Дима', '#0000ffff', NARODY[1] ) );
+// setup.classList.remove( 'is-active' );
+// igra.nachat();
