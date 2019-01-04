@@ -2,10 +2,6 @@
     width: 660px;
 }
 
-.modal-card-body {
-    overflow: hidden;
-}
-
 .card-content {
     padding: 0.5em;
 }
@@ -22,6 +18,28 @@
 
 .narod-vybran {
     background-color: #C0DFFF;
+}
+
+.narod-ispolzovan {
+    cursor: default !important;
+    opacity: 0.5;
+}
+
+.igroki {
+    overflow: hidden;
+    min-height: 12em;
+}
+
+.igroki-riad {
+    flex-flow: wrap;
+}
+
+.igrok {
+    margin: 0.25em;
+}
+
+.igrok-kartochka {
+    padding: 0.25em;
 }
 
 .avatar-igroka {

@@ -11,10 +11,11 @@
     <link rel="stylesheet" href="./style.css">
 
     <script src="./node_modules/vanilla-picker/dist/vanilla-picker.js"></script>
+    <script src="./common.js"></script>
   </head>
 
   <body>
-    <div class="modal is-active">
+    <div class="modal is-active" id="setup">
       <div class="modal-background"></div>
       
       <div class="modal-card">
@@ -53,9 +54,9 @@
           <button class="button is-success" id="novyjIgrokSozdat" disabled>Создать</button>
         </footer>
         
-        <section class="modal-card-body">
+        <section class="modal-card-body igroki">
           <h1 class="title">Игроки</h1>
-          <div class="is-flex" id="igroki">
+          <div class="is-flex igroki-riad" id="igroki">
           </div>
         </section>
         
