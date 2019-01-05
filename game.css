@@ -35,6 +35,10 @@
   justify-content: center;
 
   cursor: pointer;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 
 .kletka-otkuda {
@@ -45,11 +49,64 @@
   outline: 10px solid #80A0ff;
 }
 
+.levaja-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 10em;
+}
+
+.hod {
+  padding: 1.25em 0.5em;
+}
+
+.doska {
+  display: flex;
+  flex-direction: column;
+  max-width: 10em;
+  margin: 0.5em auto;
+}
+
+.kubiki-igroka {
+  margin-top: 0.25em;
+  border-bottom: 1px solid #bbb;
+}
+
+.kubiki {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
+}
+
+.kubik {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #444;
+  margin: 0.25em;
+
+  background-size: auto 100%;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  border-radius: 5px;
+}
+
+.kubik-ataki {
+  background-image: url(./img/cube-attack.png);
+}
+
+.kubik-zaschity {
+  background-image: url(./img/cube-defence.png);
+}
+
+.knopka-hoda {
+  width: 100%;
+}
+
 .spisok-igrokov {
   display: inline-flex;
   flex-direction: column;
 }
 
 .aktivnyj-igrok-v-spiske {
-  background-color: #ccc;
+  background-color: #bdf;
 }

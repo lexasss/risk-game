@@ -1,3 +1,5 @@
+const sdelatHodEl = document.querySelector('#sdelat-hod');
+const statusStrokaEl = document.querySelector('.status-stroka');
 const spisokIgrokovEl = document.querySelector('.spisok-igrokov');
 const kartaEl = document.querySelector('.karta');
 
@@ -5,18 +7,20 @@ const rootStyle = getComputedStyle( document.documentElement );
 const kletokVshirinu = +rootStyle.getPropertyValue('--razmer-karty-kletok-goriz');
 const kletokVvysotu = +rootStyle.getPropertyValue('--razmer-karty-kletok-vert');
 
+const kubikiAtaki = [
+    new Kubik( document.querySelector('#kubik-ataki-1') ),
+    new Kubik( document.querySelector('#kubik-ataki-2') ),
+    new Kubik( document.querySelector('#kubik-ataki-3') ),
+];
+
+const kubikiZaschity = [
+    new Kubik( document.querySelector('#kubik-zaschity-1') ),
+    new Kubik( document.querySelector('#kubik-zaschity-2') ),
+];
+
 const kletki = [];
 
-class Kletka {
-    constructor( strochka, stolbik, el ) {
-        this.strochka = strochka;
-        this.stolbik = stolbik;
-        this.el = el;
-
-        this.igrok = null;
-        this.soldaty = 0;
-    }
-}
+sdelatHodEl.addEventListener( 'click', sdelatHod );
 
 for (let i = 0; i < kletokVvysotu; i++) {
     const stroka = [];
@@ -83,32 +87,220 @@ function dobavitIgrokaVSpisok( igrok ) {
     igrok.el = card;
 }
 
-function zahvatit( mesto, igrok, chisloSoldat ) {
+function zahvatitKletkuPoAdresu( mesto, igrok, chisloSoldat ) {
     const kletka = kletki[ mesto.strochka ][ mesto.stolbik ];
+    zahvatitKletku( kletka, igrok, chisloSoldat );
+}
+
+function zahvatitKletku( kletka, igrok, chisloSoldat ) {
     kletka.igrok = igrok;
-    kletka.chisloSoldat = chisloSoldat
+    kletka.soldaty = chisloSoldat;
 
     kletka.el.style.backgroundColor = igrok.cvet.substr( 0, 7 ) + '80';
     kletka.el.textContent = chisloSoldat ? chisloSoldat.toString() : '';
 }
 
-let kletkaHoditOtkuda = null;
-let kletkaHoditKuda = null;
 function kletkaKliknuta( strochka, stolbik ) {
     return e => {
-        const kletka = kletki[ strochka ][ stolbik ];
-        if (!kletkaHoditOtkuda && kletka.igrok && kletka.igrok.hod) {
-            kletkaHoditOtkuda = kletka;
-            kletka.el.classList.add('kletka-otkuda');
+        if (sostojanie === SOSTOJANIJA.vojna) {
+            return;
         }
-        else if (kletkaHoditOtkuda && kletkaHoditOtkuda.igrok !== kletka.igrok) {
-            const dx = kletkaHoditOtkuda.strochka - kletka.strochka;
-            const dy = kletkaHoditOtkuda.stolbik - kletka.stolbik;
-            console.log(dx, dy);
-            if (Math.abs( dx ) < 2 && Math.abs( dy ) < 2) {
-                kletkaHoditKuda = kletka;
-                kletka.el.classList.add('kletka-kuda');
+
+        const kletka = kletki[ strochka ][ stolbik ];
+        const hodiaschijIgrok = igroki.find( igrok => igrok.hod );
+
+        if (kletka.igrok === hodiaschijIgrok && hodiaschijIgrok.kolichestvoNovyhSoldat > hodiaschijIgrok.kolichestvoNovyhSoldatDobavleno) {
+            dobavitSoldat( hodiaschijIgrok, kletka, 1 );
+        }
+        else if (kletka.igrok === hodiaschijIgrok && !hodiaschijIgrok.kletkaOtkuda && kletka.soldaty > 1) {
+            ustanovitKletkuOtkuda( hodiaschijIgrok, kletka );
+            sdelat( _ => ustanovitStatus('Куда нападать?') ).cherez( 1 );
+        }
+        else if (hodiaschijIgrok.kletkaOtkuda) {
+            if (kletka.igrok !== hodiaschijIgrok) {
+                const dx = hodiaschijIgrok.kletkaOtkuda.strochka - kletka.strochka;
+                const dy = hodiaschijIgrok.kletkaOtkuda.stolbik - kletka.stolbik;
+
+                if (Math.abs( dx ) < 2 && Math.abs( dy ) < 2) {
+                    hodiaschijIgrok.kletkaKuda = kletka;
+
+                    kletki.forEach( strochka => strochka.forEach( kletka => kletka.el.classList.remove('kletka-kuda') ) );
+
+                    kletka.el.classList.add('kletka-kuda');
+
+                    ustanovitKubiki( hodiaschijIgrok.kletkaOtkuda, hodiaschijIgrok.kletkaKuda );
+
+                    sdelat( _ => ustanovitStatus('Война!') ).cherez( 1 );
+                }
+            }
+            else if (kletka.igrok === hodiaschijIgrok && kletka.soldaty > 1) {
+                ustanovitKletkuOtkuda( hodiaschijIgrok, kletka );
             }
         }
+
+        proveritKnopkuHoda();
     };
+}
+
+function ustanovitKletkuOtkuda( igrok, kletka ) {
+    igrok.kletkaOtkuda = kletka;
+
+    kletki.forEach( strochka => strochka.forEach( kletka => kletka.el.classList.remove('kletka-otkuda') ) );
+
+    kletka.el.classList.add('kletka-otkuda');
+}
+
+
+function sdelatHod( e ) {
+    sdelatHodEl.disabled = true;
+    sostojanie = SOSTOJANIJA.vojna;
+
+    kubikiAtaki.forEach( kubik => kubik.brosit() );
+    kubikiZaschity.forEach( kubik => kubik.brosit() );
+
+    sdelat( ocenitBroski ).cherez( 1 );
+}
+
+function ocenitBroski() {
+    const znachenijaAtaki = kubikiAtaki
+        .map( kubik => kubik.znachenie )
+        .filter( znachenie => znachenie > 0 )
+        .sort( (a, b) => a < b );
+    const znachenijaZaschity = kubikiZaschity
+        .map( kubik => kubik.znachenie )
+        .filter( znachenie => znachenie > 0 )
+        .sort( (a, b) => a < b );
+
+    let vyjgryshAtaki = 0;
+    let vyjgryshZaschity = 0;
+    for (let i = 0; i < znachenijaAtaki.length && i < znachenijaZaschity.length; i++) {
+        if (znachenijaAtaki[i] > znachenijaZaschity[i]) {
+            vyjgryshAtaki++;
+        }
+        else {
+            vyjgryshZaschity++;
+        }
+    }
+
+    console.log(znachenijaAtaki);
+    console.log(znachenijaZaschity);
+    console.log(vyjgryshAtaki);
+    console.log(vyjgryshZaschity);
+
+    const hodiaschijIgrok = igroki.find( igrok => igrok.hod );
+    if (!vyjgryshAtaki) {
+        // победила защита
+        ubratSoldat( hodiaschijIgrok.kletkaOtkuda, 2 );
+    }
+    else if (!vyjgryshZaschity) {
+        // победила атака
+        ubratSoldat( hodiaschijIgrok.kletkaKuda, 2 );
+    }
+    else {
+        // по одному
+        ubratSoldat( hodiaschijIgrok.kletkaOtkuda, 1 );
+        ubratSoldat( hodiaschijIgrok.kletkaKuda, 1 );
+    }
+
+    if (hodiaschijIgrok.kletkaOtkuda.soldaty > 1 && hodiaschijIgrok.kletkaKuda.soldaty > 0) {
+        ustanovitKubiki( hodiaschijIgrok.kletkaOtkuda, hodiaschijIgrok.kletkaKuda );
+        sdelatHodEl.disabled = false;
+    }
+    else {
+        if (hodiaschijIgrok.kletkaOtkuda.soldaty > 1) {
+            perejtiSoldatami( hodiaschijIgrok.kletkaOtkuda, hodiaschijIgrok.kletkaKuda, hodiaschijIgrok.kletkaOtkuda.soldaty - 1 );
+        }
+        zavershitHod();
+    }
+}
+
+function ubratSoldat( kletka, kolichestvo ) {
+    kletka.soldaty = Math.max( 0, kletka.soldaty - kolichestvo );
+    kletka.el.textContent = kletka.soldaty.toString();
+}
+
+function perejtiSoldatami( otkuda, kuda, kolichestvo ) {
+    otkuda.soldaty -= kolichestvo;
+    otkuda.el.textContent = otkuda.soldaty.toString();
+
+    zahvatitKletku( kuda, otkuda.igrok, kolichestvo );
+}
+
+function zavershitHod() {
+    const hodiaschijIgrok = igroki.find( igrok => igrok.hod );
+
+    hodiaschijIgrok.kletkaOtkuda.el.classList.remove('kletka-otkuda');
+    hodiaschijIgrok.kletkaOtkuda = null;
+
+    hodiaschijIgrok.kletkaKuda.el.classList.remove('kletka-kuda');
+    hodiaschijIgrok.kletkaKuda = null;
+
+    let sledujuschijIndex = igroki.findIndex( igrok => igrok.hod ) + 1;
+    if (sledujuschijIndex === igroki.length) {
+        sledujuschijIndex = 0;
+    }
+
+    ustanovitHodiaschegoIgroka( sledujuschijIndex );
+
+    proveritKnopkuHoda();
+}
+
+function proveritKnopkuHoda() {
+    const hodiaschijIgrok = igroki.find( igrok => igrok.hod );
+    sdelatHodEl.disabled = !hodiaschijIgrok.kletkaOtkuda || !hodiaschijIgrok.kletkaKuda;
+}
+
+function ustanovitHodiaschegoIgroka( sledujuschijIndex ) {
+    igroki.forEach( igrok => {
+        igrok.el.classList.remove('aktivnyj-igrok-v-spiske');
+        igrok.hod = false;
+    });
+
+    const sledujuchijIgrok = igroki[ sledujuschijIndex ];
+    sledujuchijIgrok.el.classList.add('aktivnyj-igrok-v-spiske');
+    sledujuchijIgrok.hod = true;
+    sledujuchijIgrok.kolichestvoNovyhSoldat = 5;
+    sledujuchijIgrok.kolichestvoNovyhSoldatDobavleno = 0;
+
+    sostojanie = SOSTOJANIJA.podgotovka;
+
+    ustanovitStatus( `0/${sledujuchijIgrok.kolichestvoNovyhSoldat}  армий расположено` );
+}
+
+function dobavitSoldat( igrok, kletka, kolichestvo ) {
+    const ostalosDobavit = igrok.kolichestvoNovyhSoldat - igrok.kolichestvoNovyhSoldatDobavleno;
+    const kolichestvoSoldat = Math.min( ostalosDobavit, kolichestvo );
+    igrok.kolichestvoNovyhSoldatDobavleno += kolichestvoSoldat;
+    kletka.soldaty += kolichestvoSoldat;
+    kletka.el.textContent = kletka.soldaty;
+
+    ustanovitStatus( `${igrok.kolichestvoNovyhSoldatDobavleno}/${igrok.kolichestvoNovyhSoldat} армий расположено` );
+
+    if (igrok.kolichestvoNovyhSoldatDobavleno === igrok.kolichestvoNovyhSoldat) {
+        sdelat( _ => ustanovitStatus('Откуда нападать?') ).cherez( 1 );
+    }
+}
+
+function ustanovitStatus( stroka ) {
+    statusStrokaEl.textContent = stroka;
+}
+
+function sdelat( cb ) {
+    return {
+        cherez( sekund ) {
+            setTimeout( cb, sekund*1000 );
+        }
+    };
+}
+
+function ustanovitKubiki( kletkaAtaki, kletkaZaschity ) {
+    kubikiAtaki.forEach( (kubik, index) => {
+        kubik.aktivnyj = kletkaAtaki.soldaty > (index + 1);
+        kubik.el.style.display = kubik.aktivnyj ? 'block' : 'none';
+        
+    });
+    kubikiZaschity.forEach( (kubik, index) => {
+        kubik.aktivnyj = kletkaZaschity.soldaty > index;
+        kubik.el.style.display = kubik.aktivnyj ? 'block' : 'none';
+    });
 }

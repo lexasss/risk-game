@@ -186,7 +186,7 @@ proveritKolichestvoIgrokov();
 
 
 // Делаем игроков автоматически
-// igroki.push( new Igrok( 'Олег', '#ff0000ff', NARODY[0] ) );
-// igroki.push( new Igrok( 'Дима', '#0000ffff', NARODY[1] ) );
-// setup.classList.remove( 'is-active' );
-// igra.nachat();
+igroki.push( new Igrok( 'Папа Олег', '#ff0000ff', NARODY[0] ) );
+igroki.push( new Igrok( 'Дима', '#0000ffff', NARODY[1] ) );
+setup.classList.remove( 'is-active' );
+igra.nachat();
