@@ -31,19 +31,48 @@ class Kletka {
         this.strochka = strocka;
         this.el = el;
 
-        this.igrok = null;
-        this.soldaty = 1;
+        this._igrok = null;
+        this._soldaty = 1;
 
         if (this.el) {
             this.el.textContent = this.soldaty.toString();
         }
+    }
+
+    get igrok() { return this._igrok; }
+    set igrok( znachenie ) {
+        this._igrok = znachenie;
+        this.el.style.backgroundColor = this.igrok ? 
+            this.igrok.cvet.substr( 0, 7 ) + '80' :
+            'rgba(0, 0, 0, 0)';
+    }
+
+    get soldaty() { return this._soldaty; }
+    set soldaty( znachenie ) {
+        this._soldaty = znachenie;
+        this.el.textContent = znachenie ? znachenie.toString() : '';
+    }
+
+    sbrositRol( rol ) {
+        this.el.classList.remove( rol );
+    }
+
+    ustanovitRol( rol ) {
+        this.el.classList.add( rol );
+    }
+
+    static get ROLI() {
+        return {
+            kuda: 'kletka-kuda',
+            otkuda: 'kletka-otkuda',
+        };
     }
 }
 
 class Kubik {
     constructor( el ) {
         this.el = el;
-        this.aktivnyj = true;
+        this._aktivnyj = true;
         this.znachenie = 1;
     }
 
@@ -55,6 +84,13 @@ class Kubik {
         else {
             this.znachenie = 0;
         }
+    }
+
+    get aktivnyj() { return this._aktivnyj; }
+    set aktivnyj( znachenie ) {
+        this._aktivnyj = znachenie;
+        this.el.style.display = znachenie ? 'block' : 'none';
+
     }
 }
 
@@ -72,18 +108,21 @@ const NARODY = [
 ];
 
 const SOSTOJANIJA = {
+    vybolIgrokov: 'выбор игроков',
     podgotovka: 'подготовка',
     vojna: 'война',
 };
 
-let sostojanie = SOSTOJANIJA.podgotovka;
-
 const igra = {
+    sostojanie: SOSTOJANIJA.vybolIgrokov,
+
     nachat() {
         igroki.forEach( igrok => {
             dobavitIgrokaVSpisok( igrok );
             zahvatitKletkuPoAdresu( igrok.narod.kletkaDoma, igrok, 1 );
         });
+
+        this.sostojanie = SOSTOJANIJA.podgotovka;
 
         ustanovitHodiaschegoIgroka( 0 );
     }

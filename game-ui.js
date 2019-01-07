@@ -95,14 +95,11 @@ function zahvatitKletkuPoAdresu( mesto, igrok, chisloSoldat ) {
 function zahvatitKletku( kletka, igrok, chisloSoldat ) {
     kletka.igrok = igrok;
     kletka.soldaty = chisloSoldat;
-
-    kletka.el.style.backgroundColor = igrok.cvet.substr( 0, 7 ) + '80';
-    kletka.el.textContent = chisloSoldat ? chisloSoldat.toString() : '';
 }
 
 function kletkaKliknuta( strochka, stolbik ) {
     return e => {
-        if (sostojanie === SOSTOJANIJA.vojna) {
+        if (igra.sostojanie === SOSTOJANIJA.vojna) {
             return;
         }
 
@@ -124,9 +121,9 @@ function kletkaKliknuta( strochka, stolbik ) {
                 if (Math.abs( dx ) < 2 && Math.abs( dy ) < 2) {
                     hodiaschijIgrok.kletkaKuda = kletka;
 
-                    kletki.forEach( strochka => strochka.forEach( kletka => kletka.el.classList.remove('kletka-kuda') ) );
+                    kletki.forEach( strochka => strochka.forEach( kletka => kletka.sbrositRol( Kletka.ROLI.kuda ) ) );
 
-                    kletka.el.classList.add('kletka-kuda');
+                    kletka.ustanovitRol( Kletka.ROLI.kuda );
 
                     ustanovitKubiki( hodiaschijIgrok.kletkaOtkuda, hodiaschijIgrok.kletkaKuda );
 
@@ -145,15 +142,16 @@ function kletkaKliknuta( strochka, stolbik ) {
 function ustanovitKletkuOtkuda( igrok, kletka ) {
     igrok.kletkaOtkuda = kletka;
 
-    kletki.forEach( strochka => strochka.forEach( kletka => kletka.el.classList.remove('kletka-otkuda') ) );
+    kletki.forEach( strochka => strochka.forEach( kletka => kletka.sbrositRol( Kletka.ROLI.otkuda ) ) );
 
-    kletka.el.classList.add('kletka-otkuda');
+    kletka.ustanovitRol( Kletka.ROLI.otkuda );
 }
 
 
 function sdelatHod( e ) {
     sdelatHodEl.disabled = true;
-    sostojanie = SOSTOJANIJA.vojna;
+
+    igra.sostojanie = SOSTOJANIJA.vojna;
 
     kubikiAtaki.forEach( kubik => kubik.brosit() );
     kubikiZaschity.forEach( kubik => kubik.brosit() );
@@ -182,24 +180,23 @@ function ocenitBroski() {
         }
     }
 
-    console.log(znachenijaAtaki);
-    console.log(znachenijaZaschity);
-    console.log(vyjgryshAtaki);
-    console.log(vyjgryshZaschity);
-
     const hodiaschijIgrok = igroki.find( igrok => igrok.hod );
-    if (!vyjgryshAtaki) {
-        // победила защита
-        ubratSoldat( hodiaschijIgrok.kletkaOtkuda, 2 );
+    if (vyjgryshZaschity !== 0) {
+        ubratSoldat( hodiaschijIgrok.kletkaOtkuda, vyjgryshZaschity );
     }
-    else if (!vyjgryshZaschity) {
-        // победила атака
-        ubratSoldat( hodiaschijIgrok.kletkaKuda, 2 );
+    if (vyjgryshAtaki !== 0) {
+        ubratSoldat( hodiaschijIgrok.kletkaKuda, vyjgryshAtaki );
+    }
+
+    if (vyjgryshZaschity === 0) {
+        ustanovitStatus(`${hodiaschijIgrok.imia} победил`);
+    }
+    else if (vyjgryshAtaki === 0) {
+        const zaschitnik = hodiaschijIgrok.kletkaKuda.igrok;
+        ustanovitStatus(zaschitnik ? `${zaschitnik.imia} отбился` : `${hodiaschijIgrok.imia} проиграл`);
     }
     else {
-        // по одному
-        ubratSoldat( hodiaschijIgrok.kletkaOtkuda, 1 );
-        ubratSoldat( hodiaschijIgrok.kletkaKuda, 1 );
+        ustanovitStatus(`по одному`);
     }
 
     if (hodiaschijIgrok.kletkaOtkuda.soldaty > 1 && hodiaschijIgrok.kletkaKuda.soldaty > 0) {
@@ -216,7 +213,6 @@ function ocenitBroski() {
 
 function ubratSoldat( kletka, kolichestvo ) {
     kletka.soldaty = Math.max( 0, kletka.soldaty - kolichestvo );
-    kletka.el.textContent = kletka.soldaty.toString();
 }
 
 function perejtiSoldatami( otkuda, kuda, kolichestvo ) {
@@ -262,7 +258,7 @@ function ustanovitHodiaschegoIgroka( sledujuschijIndex ) {
     sledujuchijIgrok.kolichestvoNovyhSoldat = 5;
     sledujuchijIgrok.kolichestvoNovyhSoldatDobavleno = 0;
 
-    sostojanie = SOSTOJANIJA.podgotovka;
+    igra.sostojanie = SOSTOJANIJA.podgotovka;
 
     ustanovitStatus( `0/${sledujuchijIgrok.kolichestvoNovyhSoldat}  армий расположено` );
 }
@@ -272,7 +268,6 @@ function dobavitSoldat( igrok, kletka, kolichestvo ) {
     const kolichestvoSoldat = Math.min( ostalosDobavit, kolichestvo );
     igrok.kolichestvoNovyhSoldatDobavleno += kolichestvoSoldat;
     kletka.soldaty += kolichestvoSoldat;
-    kletka.el.textContent = kletka.soldaty;
 
     ustanovitStatus( `${igrok.kolichestvoNovyhSoldatDobavleno}/${igrok.kolichestvoNovyhSoldat} армий расположено` );
 
@@ -285,22 +280,20 @@ function ustanovitStatus( stroka ) {
     statusStrokaEl.textContent = stroka;
 }
 
-function sdelat( cb ) {
-    return {
-        cherez( sekund ) {
-            setTimeout( cb, sekund*1000 );
-        }
-    };
-}
-
 function ustanovitKubiki( kletkaAtaki, kletkaZaschity ) {
     kubikiAtaki.forEach( (kubik, index) => {
         kubik.aktivnyj = kletkaAtaki.soldaty > (index + 1);
-        kubik.el.style.display = kubik.aktivnyj ? 'block' : 'none';
         
     });
     kubikiZaschity.forEach( (kubik, index) => {
         kubik.aktivnyj = kletkaZaschity.soldaty > index;
-        kubik.el.style.display = kubik.aktivnyj ? 'block' : 'none';
     });
+}
+
+function sdelat( dejstvie ) {
+    return {
+        cherez( sekund ) {
+            setTimeout( dejstvie, sekund * 1000 );
+        }
+    };
 }
